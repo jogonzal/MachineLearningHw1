@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-
+using System.Threading.Tasks;
 using MachineLearningHw1.DataSet;
 using MachineLearningHw1.DecisionTreeClasses;
 
@@ -9,23 +10,37 @@ namespace MachineLearningHw1
 	public class Program
 	{
 		private static string DataSetPath => Path.Combine(Directory.GetCurrentDirectory() + @"\..\..\..\training_subsetD.arff");
+		private static string TestSetPath => Path.Combine(Directory.GetCurrentDirectory() + @"\..\..\..\testingD.arff");
 
 		static void Main(string[] args)
 		{
-			string dataSetAsString = File.ReadAllText(DataSetPath);
-
-			// Parse the dataset
-			List<DataSetAttribute> attributes = AttributeParser.ParseAttributes(dataSetAsString);
-			List<DataSetValue> dataSetValues = DataParser.ParseData(dataSetAsString);
+			// Get and parse the training dataset
+			ParserResults trainingData = ParserUtils.ParseData(DataSetPath);
 
 			// Validate and clean the dataset
-			DataSetCleaner.ValidateDataSet(attributes, dataSetValues);
+			DataSetCleaner.ValidateDataSet(trainingData.Attributes, trainingData.Values);
 
-			// Initialize the tree
-			DecisionTreeLevel treeLevel = new DecisionTreeLevel(attributes, dataSetValues, 0.99);
+			// Initialize the required trees
+			List<DecisionTreeLevel> listOfTreesToRunTestOn = new List<DecisionTreeLevel>()
+			{
+				new DecisionTreeLevel(trainingData.Attributes, trainingData.Values, 0.99),
+				new DecisionTreeLevel(trainingData.Attributes, trainingData.Values, 0.95),
+				new DecisionTreeLevel(trainingData.Attributes, trainingData.Values, 0.50),
+				new DecisionTreeLevel(trainingData.Attributes, trainingData.Values, 0),
+			};
 
-			// Run D3 on the tree
-			treeLevel.D3();
+			// Run D3 on all trees
+			Parallel.ForEach(listOfTreesToRunTestOn, l => l.D3());
+
+			// Get and parse the test dataset
+			ParserResults testData = ParserUtils.ParseData(TestSetPath);
+
+			// Evaluate the trees with the test dataset
+			foreach (var decisionTree in listOfTreesToRunTestOn)
+			{
+				DecisionTreeScore score = DecisionTreeScorer.ScoreWithTreeWithTestSet(decisionTree, testData.Values);
+				score.PrintTotalScore();
+			}
 		}
 	}
 }

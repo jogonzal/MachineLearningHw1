@@ -9,12 +9,12 @@ namespace MachineLearningHw1.DecisionTreeClasses
 {
 	public class DecisionTreeLevel
 	{
-		private readonly double _chiTestLimit;
+		public double ChiTestLimit { get; }
 
 		/// <summary>
 		/// Keep track on the attribute we split on
 		/// </summary>
-		private DataSetAttribute _attributeToSplitOn;
+		private DataSetAttributeWithCounts _attributeToSplitOn;
 
 		/// <summary>
 		/// The dictionary of subtrees
@@ -28,7 +28,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		public DecisionTreeLevel(List<DataSetAttribute> attributes, List<DataSetValue> values, double chiTestLimit)
 		{
-			_chiTestLimit = chiTestLimit;
+			ChiTestLimit = chiTestLimit;
 			Attributes = attributes;
 			Values = values;
 		}
@@ -51,14 +51,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 				return;
 			}
 
-			// We'll need to split based on attributes
-
-			// First, find the attribute with the highest "E"
-			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes();
-			DataSetAttributeWithCounts attributeWithMinEntropy = FindAttributeWithMinEntropy(e);
-			_attributeToSplitOn = attributeWithMinEntropy;
-
-			// Decide whether it's worth it to split here
+			// Can we split on attributes?
 			if (Attributes.Count == 0)
 			{
 				// Can't split anymore. We'll decide on the most prevalent value
@@ -66,7 +59,13 @@ namespace MachineLearningHw1.DecisionTreeClasses
 				return;
 			}
 
-			if(!ShouldSplitOnAttributeAccordingToChiSquared(attributeWithMinEntropy))
+			// First, find the attribute with the highest "E"
+			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes();
+			DataSetAttributeWithCounts attributeWithMinEntropy = FindAttributeWithMinEntropy(e);
+			_attributeToSplitOn = attributeWithMinEntropy;
+
+			// Is it worth it to split on attributes
+			if (!ShouldSplitOnAttributeAccordingToChiSquared(attributeWithMinEntropy))
 			{
 				// Not worth it to split. We'll decide on the most prevalent value
 				_localValue = totalTrueValues > totalFalseValues;
@@ -84,7 +83,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 				DecisionTreeLevel localTreeLevel;
 				if (!_dictionaryOfSubTrees.TryGetValue(value, out localTreeLevel))
 				{
-					localTreeLevel = new DecisionTreeLevel(newAttributes, new List<DataSetValue>(), _chiTestLimit);
+					localTreeLevel = new DecisionTreeLevel(newAttributes, new List<DataSetValue>(), ChiTestLimit);
 					_dictionaryOfSubTrees[value] = localTreeLevel;
 				}
 
@@ -127,7 +126,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 			double chiQuareCumulative = ChiSquaredUtils.CalculateChiSquareCDT(attributeToSplitOn.PossibleValueCounts.Count - 1, chiTestValue);
 
-			return chiQuareCumulative >= _chiTestLimit;
+			return chiQuareCumulative >= ChiTestLimit;
 		}
 
 		private DataSetAttributeWithCounts FindAttributeWithMinEntropy(List<DataSetAttributeWithCounts> dataSetAttributeWithCountses)
@@ -167,7 +166,16 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			}
 
 			string attributeValue = list[_attributeToSplitOn.ValueIndex];
-			var nextTreeLevel = _dictionaryOfSubTrees[attributeValue];
+
+			// Need to handle case where we've never seen the value
+			DecisionTreeLevel nextTreeLevel;
+			if (!_dictionaryOfSubTrees.TryGetValue(attributeValue, out nextTreeLevel))
+			{
+				int maxAppearCount = _attributeToSplitOn.PossibleValueCounts.Max(m => m.Value.AppearCount);
+				var attributeToChoose = _attributeToSplitOn.PossibleValueCounts.First(s => s.Value.AppearCount == maxAppearCount);
+				nextTreeLevel = _dictionaryOfSubTrees[attributeToChoose.Key];
+			}
+
 			return nextTreeLevel.Evaluate(list);
 		}
 
