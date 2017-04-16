@@ -3,6 +3,7 @@ using System.Linq;
 
 using MachineLearningHw1.DataSet;
 using MachineLearningHw1.Statistics;
+using Newtonsoft.Json;
 
 namespace MachineLearningHw1.DecisionTreeClasses
 {
@@ -168,6 +169,29 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			string attributeValue = list[_attributeToSplitOn.ValueIndex];
 			var nextTreeLevel = _dictionaryOfSubTrees[attributeValue];
 			return nextTreeLevel.Evaluate(list);
+		}
+
+		public string SerializeDecisionTree()
+		{
+			var decisionTree = GetDecisionTree();
+			return JsonConvert.SerializeObject(decisionTree, Formatting.Indented);
+		}
+
+		private object GetDecisionTree()
+		{
+			if (_localValue.HasValue)
+			{
+				return _localValue;
+			}
+
+			var dict = new Dictionary<string, Dictionary<string, object>>();
+			var internalDict = new Dictionary<string, object>();
+			dict[_attributeToSplitOn.Name] = internalDict;
+			foreach (var keyValuePair in _dictionaryOfSubTrees)
+			{
+				internalDict[keyValuePair.Key] = keyValuePair.Value.GetDecisionTree();
+			}
+			return dict;
 		}
 	}
 }

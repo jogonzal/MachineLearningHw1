@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Diagnostics;
 using FluentAssertions;
 
 using MachineLearningHw1.DataSet;
@@ -151,6 +151,10 @@ namespace MachineLearningHw1UnitTests
 			{
 				decisionTree.Evaluate(dataSetValue.Values).Should().Be(dataSetValue.Output);
 			}
+
+			// Break here to visualize decision tree
+			string visualizedDecisionTree = decisionTree.SerializeDecisionTree();
+			Debug.WriteLine("Visualized decision tree:\n" + visualizedDecisionTree);
 		}
 	}
 }
