@@ -37,14 +37,13 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		{
 			// First, compute the count of appearences of possible vlaues and their counts
 			List<DataSetAttributeWithCounts> attributeWithCounts =
-				Attributes.Select(s => new DataSetAttributeWithCounts(s.Name, s.PossibleValues)).ToList();
+				Attributes.Select(s => new DataSetAttributeWithCounts(s.Name, s.PossibleValues, s.ValueIndex)).ToList();
 			foreach (var value in Values)
 			{
-				for (int i = 0; i < attributeWithCounts.Count; i++)
+				foreach (var dataSetAttributeWithCounts in attributeWithCounts)
 				{
-					var attribute = attributeWithCounts[i];
-					var attributeValue = value.Values[i];
-					attribute.UpdateWith(attributeValue, value.Output);
+					var attributeValue = value.Values[dataSetAttributeWithCounts.ValueIndex];
+					dataSetAttributeWithCounts.UpdateWith(attributeValue, value.Output);
 				}
 			}
 

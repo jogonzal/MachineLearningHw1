@@ -29,7 +29,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		public double Entropy { get; set; }
 
-		public DataSetAttributeWithCounts(string name, HashSet<string> possibleValues) : base(name, possibleValues)
+		public DataSetAttributeWithCounts(string name, HashSet<string> possibleValues, int valueIndex) : base(name, possibleValues, valueIndex)
 		{
 			_possibleValueCounts = new Dictionary<string, PossibleValuesCounts>(PossibleValues.Count);
 			Entropy = -999999999999;

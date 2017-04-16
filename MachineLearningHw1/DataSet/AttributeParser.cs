@@ -17,8 +17,9 @@ namespace MachineLearningHw1.DataSet
 
 			var listOfAttributesAsString = attributesString.Split('\n');
 			List<DataSetAttribute> attributes = new List<DataSetAttribute>(listOfAttributesAsString.Length);
-			foreach (var attributeAsString in listOfAttributesAsString)
+			for (int index = 0; index < listOfAttributesAsString.Length; index++)
 			{
+				var attributeAsString = listOfAttributesAsString[index];
 				if (string.IsNullOrEmpty(attributeAsString))
 				{
 					continue;
@@ -41,7 +42,7 @@ namespace MachineLearningHw1.DataSet
 					}
 				}
 
-				var attribute = new DataSetAttribute(name, hashSet);
+				var attribute = new DataSetAttribute(name, hashSet, index);
 				attributes.Add(attribute);
 			}
 

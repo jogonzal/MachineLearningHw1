@@ -9,22 +9,22 @@ namespace MachineLearningHw1.DataSet
 		{
 			foreach (var dataSetValue in dataSetValues)
 			{
-				for (int i = 0; i < attributes.Count; i++)
+				foreach (var dataSetAttribute in attributes)
 				{
-					string val = dataSetValue.Values[i];
-					bool isValueAllowed = attributes[i].PossibleValues.Contains(val);
+					string val = dataSetValue.Values[dataSetAttribute.ValueIndex];
+					bool isValueAllowed = dataSetAttribute.PossibleValues.Contains(val);
 
 					if (val == "?" && !isValueAllowed)
 					{
 						// questionmarks are nulls
-						attributes[i].PossibleValues.Add("NULL");
-						dataSetValue.Values[i] = "NULL";
+						dataSetAttribute.PossibleValues.Add("NULL");
+						dataSetValue.Values[dataSetAttribute.ValueIndex] = "NULL";
 						continue;
 					}
 
 					if (!isValueAllowed)
 					{
-						throw new InvalidOperationException($"Failed to find value {val} of type {attributes[i].Name}. Allowed list is {string.Join(",", attributes[i].PossibleValues)}");
+						throw new InvalidOperationException($"Failed to find value {val} of type {dataSetAttribute.Name}. Allowed list is {string.Join(",", dataSetAttribute.PossibleValues)}");
 					}
 				}
 			}
