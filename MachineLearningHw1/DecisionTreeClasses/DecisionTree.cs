@@ -1,7 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+
 using MachineLearningHw1.DataSet;
 
 namespace MachineLearningHw1.DecisionTreeClasses
