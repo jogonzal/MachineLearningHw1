@@ -157,6 +157,7 @@ namespace MachineLearningHw1UnitTests
 			DecisionTreeLevel decisionTree = new DecisionTreeLevel(0);
 
 			decisionTree.D3(_generic3BooleanAttributes, tableToLearn);
+			decisionTree.TrimTree();
 
 			// The tree should have learnt every value
 			foreach (var dataSetValue in tableToLearn)

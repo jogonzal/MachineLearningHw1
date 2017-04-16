@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using MachineLearningHw1.DataSet;
@@ -219,6 +220,45 @@ namespace MachineLearningHw1.DecisionTreeClasses
 				internalDict[keyValuePair.Key] = keyValuePair.Value.GetDecisionTree();
 			}
 			return dict;
+		}
+
+		public bool? TrimTree()
+		{
+			if (_localValue.HasValue)
+			{
+				return _localValue.Value;
+			}
+
+			HashSet<bool?> booleanBelow = new HashSet<bool?>();
+			foreach (var keyValuePair in _dictionaryOfSubTrees)
+			{
+				bool? val = keyValuePair.Value.TrimTree();
+				booleanBelow.Add(val);
+			}
+
+			bool hasBoth = booleanBelow.Contains(true) && booleanBelow.Contains(false);
+			bool hasNull = booleanBelow.Contains(null);
+
+			if (hasBoth || hasNull)
+			{
+				return null;
+			}
+
+			if (booleanBelow.Contains(true))
+			{
+				_localValue = true;
+				_dictionaryOfSubTrees = null;
+				return true;
+			}
+
+			if (booleanBelow.Contains(false))
+			{
+				_localValue = false;
+				_dictionaryOfSubTrees = null;
+				return false;
+			}
+
+			throw new InvalidOperationException();
 		}
 	}
 }

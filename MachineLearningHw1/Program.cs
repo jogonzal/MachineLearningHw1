@@ -27,15 +27,18 @@ namespace MachineLearningHw1
 			// Initialize the required trees
 			List<DecisionTreeLevel> listOfTreesToRunTestOn = new List<DecisionTreeLevel>()
 			{
-				new DecisionTreeLevel(0.99),
-				new DecisionTreeLevel(0.95),
-				new DecisionTreeLevel(0.50),
-				new DecisionTreeLevel(0),
+				new DecisionTreeLevel(chiTestLimit:0.99),
+				new DecisionTreeLevel(chiTestLimit:0.95),
+				new DecisionTreeLevel(chiTestLimit:0),
 			};
 
 			Console.WriteLine("Runnind D3...");
 			// Run D3 on all trees
 			Parallel.ForEach(listOfTreesToRunTestOn, l => l.D3(trainingData.Attributes, trainingData.Values));
+
+			// Trim down nodes that are unecessary
+			Console.WriteLine("Deleting unecessary nodes...");
+			Parallel.ForEach(listOfTreesToRunTestOn, l => l.TrimTree());
 
 			Console.WriteLine("Getting test data set...");
 			// Get and parse the test dataset
@@ -43,7 +46,8 @@ namespace MachineLearningHw1
 
 			//Console.WriteLine("Writing trees to text files (for debugging/visualization)...");
 			// Dump the trees to a txt file for debugging/visualization
-			//Parallel.ForEach(listOfTreesToRunTestOn, l => File.WriteAllText("Chi" + Convert.ToInt32(l.ChiTestLimit * 1000) + ".json", l.SerializeDecisionTree()));
+			// NOTE: This won't work the the Chi=0 case - the JSON file generated is too big
+			Parallel.ForEach(listOfTreesToRunTestOn, l => File.WriteAllText("Chi" + Convert.ToInt64(l.ChiTestLimit * 10000000000000) + ".json", l.SerializeDecisionTree()));
 
 			Console.WriteLine("Evaluating trees against test data...");
 			// Evaluate the trees with the test dataset
