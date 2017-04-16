@@ -5,18 +5,20 @@ namespace MachineLearningHw1.DataSet
 {
 	public static class DataSetValidator
 	{
-		public static void ValidateDataSet(List<DataSetAttribute> attributes, List<List<string>> dataSetValues)
+		public static void ValidateDataSet(List<DataSetAttribute> attributes, List<DataSetValue> dataSetValues)
 		{
 			foreach (var dataSetValue in dataSetValues)
 			{
 				for (int i = 0; i < attributes.Count; i++)
 				{
-					string val = dataSetValue[i];
+					string val = dataSetValue.Values[i];
 					bool isValueAllowed = attributes[i].PossibleValues.Contains(val);
 
-					if (val == "?")
+					if (val == "?" && !isValueAllowed)
 					{
-						// Allowing questionmarks
+						// questionmarks are nulls
+						attributes[i].PossibleValues.Add("NULL");
+						dataSetValue.Values[i] = "NULL";
 						continue;
 					}
 

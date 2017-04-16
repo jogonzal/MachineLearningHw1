@@ -51,6 +51,9 @@
     <Compile Include="DataSet\DataParser.cs" />
     <Compile Include="DataSet\DataSetAttribute.cs" />
     <Compile Include="DataSet\DataSetValidator.cs" />
+    <Compile Include="DataSet\DataSetValue.cs" />
+    <Compile Include="DecisionTreeClasses\DataSetAttributeWithCounts.cs" />
+    <Compile Include="DecisionTreeClasses\DecisionTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

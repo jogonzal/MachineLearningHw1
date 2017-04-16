@@ -44,6 +44,10 @@ namespace MachineLearningHw1.DataSet
 				var attribute = new DataSetAttribute(name, hashSet);
 				attributes.Add(attribute);
 			}
+
+			// Remove the last attribute, as it is the result
+			attributes.RemoveAt(attributes.Count - 1);
+
 			return attributes;
 		}
 	}

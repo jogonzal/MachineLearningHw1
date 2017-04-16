@@ -7,7 +7,9 @@ namespace MachineLearningHw1.DataSet
 {
 	public static class DataParser
 	{
-		public static List<List<string>> ParseData(string dataSetAsString)
+		private const int expectedAttributeCount = 275;
+
+		public static List<DataSetValue> ParseData(string dataSetAsString)
 		{
 			int indexOfData = dataSetAsString.IndexOf("@data");
 			string dataString = dataSetAsString.Substring(indexOfData + 5);
@@ -17,9 +19,9 @@ namespace MachineLearningHw1.DataSet
 			return result;
 		}
 
-		public static List<List<string>> ReadInCSV(string stringToRead)
+		public static List<DataSetValue> ReadInCSV(string stringToRead)
 		{
-			List<List<string>> result = new List<List<string>>();
+			List<DataSetValue> result = new List<DataSetValue>();
 			string value;
 			using (StringReader sr = new StringReader(stringToRead))
 			{
@@ -32,7 +34,12 @@ namespace MachineLearningHw1.DataSet
 					{
 						line.Add(value);
 					}
-					result.Add(line);
+
+					// Get the last attribute, which should be boolean
+					bool lastValue = bool.Parse(line[line.Count - 1]);
+					line.RemoveAt(line.Count - 1);
+
+					result.Add(new DataSetValue(line, lastValue));
 				}
 			}
 			return result;
