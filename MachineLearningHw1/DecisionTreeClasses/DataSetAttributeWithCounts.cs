@@ -11,6 +11,8 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		public int AppearCount { get; set; }
 		public int AppearWhenTrueCount { get; set; }
 
+		public int AppearWhenFalseCount => AppearCount - AppearWhenTrueCount;
+
 		public PossibleValuesCounts(int appearCount, int appearWhenTrueCount)
 		{
 			AppearCount = appearCount;
@@ -25,13 +27,13 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 	public class DataSetAttributeWithCounts : DataSetAttribute
 	{
-		private readonly Dictionary<string, PossibleValuesCounts> _possibleValueCounts;
+		public Dictionary<string, PossibleValuesCounts> PossibleValueCounts { get; }
 
 		public double Entropy { get; set; }
 
 		public DataSetAttributeWithCounts(string name, HashSet<string> possibleValues, int valueIndex) : base(name, possibleValues, valueIndex)
 		{
-			_possibleValueCounts = new Dictionary<string, PossibleValuesCounts>(PossibleValues.Count);
+			PossibleValueCounts = new Dictionary<string, PossibleValuesCounts>(PossibleValues.Count);
 			Entropy = -999999999999;
 		}
 
@@ -39,10 +41,10 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		{
 			PossibleValuesCounts possibleCount;
 			// Add it if it isn't there
-			if (!_possibleValueCounts.TryGetValue(attributeValue, out possibleCount))
+			if (!PossibleValueCounts.TryGetValue(attributeValue, out possibleCount))
 			{
 				possibleCount = new PossibleValuesCounts(0, 0);
-				_possibleValueCounts[attributeValue] = possibleCount;
+				PossibleValueCounts[attributeValue] = possibleCount;
 			}
 
 			possibleCount.AppearCount++;
@@ -55,8 +57,8 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		public void CalculateEntropy()
 		{
 			double accumulatedEntropy = 0;
-			int totalAppearancesForAllPossibleValues = _possibleValueCounts.Select(s => s.Value.AppearCount).Sum();
-			foreach (var possibleValuesCountse in _possibleValueCounts)
+			int totalAppearancesForAllPossibleValues = PossibleValueCounts.Select(s => s.Value.AppearCount).Sum();
+			foreach (var possibleValuesCountse in PossibleValueCounts)
 			{
 				int appearCount = possibleValuesCountse.Value.AppearCount;
 				int appearCountWhenTrue = possibleValuesCountse.Value.AppearWhenTrueCount;

@@ -22,7 +22,7 @@ namespace MachineLearningHw1
 			DataSetCleaner.ValidateDataSet(attributes, dataSetValues);
 
 			// Initialize the tree
-			DecisionTreeLevel treeLevel = new DecisionTreeLevel(attributes, dataSetValues);
+			DecisionTreeLevel treeLevel = new DecisionTreeLevel(attributes, dataSetValues, 0.99);
 
 			// Run D3 on the tree
 			treeLevel.D3();
