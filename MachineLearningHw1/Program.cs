@@ -22,10 +22,10 @@ namespace MachineLearningHw1
 			DataSetValidator.ValidateDataSet(attributes, dataSetValues);
 
 			// Initialize the tree
-			DecisionTree tree = new DecisionTree(attributes, dataSetValues);
+			DecisionTreeLevel treeLevel = new DecisionTreeLevel(attributes, dataSetValues);
 
 			// Run D3 on the tree
-			tree.D3();
+			treeLevel.D3();
 		}
 	}
 }

@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using MachineLearningHw1.DataSet;
 
 namespace MachineLearningHw1.DecisionTreeClasses
 {
-	public class DecisionTree
+	public class DecisionTreeLevel
 	{
+		/// <summary>
+		/// Keep track on the attribute we split on
+		/// </summary>
+		private DataSetAttribute _attributeToSplitOn;
+
 		public List<DataSetAttribute> Attributes { get; set; }
 		public List<DataSetValue> Values { get; set; }
 
-		public DecisionTree(List<DataSetAttribute> attributes, List<DataSetValue> values)
+		public DecisionTreeLevel(List<DataSetAttribute> attributes, List<DataSetValue> values)
 		{
 			Attributes = attributes;
 			Values = values;
@@ -22,8 +26,30 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			// First, find the attribute with the highest "E"
 			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes();
 			DataSetAttribute attributeWithMinEntropy = FindAttributeWithMinEntropy(e);
+			_attributeToSplitOn = attributeWithMinEntropy;
 
-			throw new NotImplementedException();
+			List<DataSetAttribute> newAttributes = Attributes.Where(a => a.Name != attributeWithMinEntropy.Name).ToList();
+
+			// Split the values in many sets
+			Dictionary<string, DecisionTreeLevel> dictionaryOfTrees = new Dictionary<string, DecisionTreeLevel>(attributeWithMinEntropy.PossibleValues.Count);
+			foreach (var dataSetValue in Values)
+			{
+				string value = dataSetValue.Values[attributeWithMinEntropy.ValueIndex];
+				DecisionTreeLevel localTreeLevel;
+				if (!dictionaryOfTrees.TryGetValue(value, out localTreeLevel))
+				{
+					localTreeLevel = new DecisionTreeLevel(newAttributes, new List<DataSetValue>());
+					dictionaryOfTrees[value] = localTreeLevel;
+				}
+
+				localTreeLevel.Values.Add(dataSetValue);
+			}
+
+			// Recursively run D3 on them
+			foreach (var decisionTree in dictionaryOfTrees.Values)
+			{
+				decisionTree.D3();
+			}
 		}
 
 		private DataSetAttribute FindAttributeWithMinEntropy(List<DataSetAttributeWithCounts> dataSetAttributeWithCountses)
