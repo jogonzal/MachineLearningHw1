@@ -66,6 +66,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MachineLearningHw1\MachineLearningHw1.csproj">
+      <Project>{2d56293b-6d83-440b-b19d-558a9d503fc1}</Project>
+      <Name>MachineLearningHw1</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

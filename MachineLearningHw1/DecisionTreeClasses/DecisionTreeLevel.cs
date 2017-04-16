@@ -20,6 +20,8 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		/// </summary>
 		private Dictionary<string, DecisionTreeLevel> _dictionaryOfSubTrees;
 
+		private bool? _localValue;
+
 		public List<DataSetAttribute> Attributes { get; set; }
 		public List<DataSetValue> Values { get; set; }
 
@@ -32,19 +34,41 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		public void D3()
 		{
-			if (Attributes.Count == 0)
+			// Check whether we even need to split or not
+			int totalTrueValues = Values.Count(v => v.Output);
+			int totalFalseValues = Values.Count(v => !v.Output);
+
+			if (totalFalseValues == 0 && totalTrueValues > 0)
 			{
+				_localValue = true;
 				return;
 			}
+
+			if (totalTrueValues == 0 && totalFalseValues > 0)
+			{
+				_localValue = false;
+				return;
+			}
+
+			// We'll need to split based on attributes
 
 			// First, find the attribute with the highest "E"
 			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes();
 			DataSetAttributeWithCounts attributeWithMinEntropy = FindAttributeWithMinEntropy(e);
 			_attributeToSplitOn = attributeWithMinEntropy;
 
-			// Decide whether we should split on this attribute
-			if (!ShouldSplitOnAttributeAccordingToChiSquared(attributeWithMinEntropy))
+			// Decide whether it's worth it to split here
+			if (Attributes.Count == 0)
 			{
+				// Can't split anymore. We'll decide on the most prevalent value
+				_localValue = totalTrueValues > totalFalseValues;
+				return;
+			}
+
+			if(!ShouldSplitOnAttributeAccordingToChiSquared(attributeWithMinEntropy))
+			{
+				// Not worth it to split. We'll decide on the most prevalent value
+				_localValue = totalTrueValues > totalFalseValues;
 				return;
 			}
 
@@ -102,7 +126,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 			double chiQuareCumulative = ChiSquaredUtils.CalculateChiSquareCDT(attributeToSplitOn.PossibleValueCounts.Count - 1, chiTestValue);
 
-			return chiQuareCumulative > _chiTestLimit;
+			return chiQuareCumulative >= _chiTestLimit;
 		}
 
 		private DataSetAttributeWithCounts FindAttributeWithMinEntropy(List<DataSetAttributeWithCounts> dataSetAttributeWithCountses)
@@ -132,6 +156,18 @@ namespace MachineLearningHw1.DecisionTreeClasses
 				dataSetAttributeWithCountse.CalculateEntropy();
 			}
 			return attributeWithCounts;
+		}
+
+		public bool Evaluate(List<string> list)
+		{
+			if (_localValue.HasValue)
+			{
+				return _localValue.Value;
+			}
+
+			string attributeValue = list[_attributeToSplitOn.ValueIndex];
+			var nextTreeLevel = _dictionaryOfSubTrees[attributeValue];
+			return nextTreeLevel.Evaluate(list);
 		}
 	}
 }
