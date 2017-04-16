@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MachineLearningHw1.DataSet
 {
-	public static class DataSetValidator
+	public static class DataSetCleaner
 	{
 		public static void ValidateDataSet(List<DataSetAttribute> attributes, List<DataSetValue> dataSetValues)
 		{

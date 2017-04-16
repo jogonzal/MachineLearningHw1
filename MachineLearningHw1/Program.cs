@@ -19,7 +19,7 @@ namespace MachineLearningHw1
 			List<DataSetValue> dataSetValues = DataParser.ParseData(dataSetAsString);
 
 			// Validate the dataset
-			DataSetValidator.ValidateDataSet(attributes, dataSetValues);
+			DataSetCleaner.ValidateDataSet(attributes, dataSetValues);
 
 			// Initialize the tree
 			DecisionTreeLevel treeLevel = new DecisionTreeLevel(attributes, dataSetValues);
