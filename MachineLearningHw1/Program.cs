@@ -17,14 +17,12 @@ namespace MachineLearningHw1
 		static void Main(string[] args)
 		{
 			Console.WriteLine("Reading training data...");
-			// Get and parse the training dataset
 			ParserResults trainingData = ParserUtils.ParseData(DataSetPath);
 
 			Console.WriteLine("Validating data set");
-			// Validate and clean the dataset
 			DataSetCleaner.ValidateDataSet(trainingData.Attributes, trainingData.Values);
 
-			// Initialize the required trees
+			// Initialize the required trees with their respective chiTestLimits
 			List<DecisionTreeLevel> listOfTreesToRunTestOn = new List<DecisionTreeLevel>()
 			{
 				new DecisionTreeLevel(chiTestLimit:0.99),
@@ -33,24 +31,20 @@ namespace MachineLearningHw1
 			};
 
 			Console.WriteLine("Runnind D3...");
-			// Run D3 on all trees
 			Parallel.ForEach(listOfTreesToRunTestOn, l => l.D3(trainingData.Attributes, trainingData.Values));
 
-			// Trim down nodes that are unecessary
 			Console.WriteLine("Deleting unecessary nodes...");
 			Parallel.ForEach(listOfTreesToRunTestOn, l => l.TrimTree());
 
 			Console.WriteLine("Getting test data set...");
-			// Get and parse the test dataset
 			ParserResults testData = ParserUtils.ParseData(TestSetPath);
 
 			//Console.WriteLine("Writing trees to text files (for debugging/visualization)...");
 			// Dump the trees to a txt file for debugging/visualization
 			// NOTE: This won't work the the Chi=0 case - the JSON file generated is too big
-			Parallel.ForEach(listOfTreesToRunTestOn, l => File.WriteAllText("Chi" + Convert.ToInt64(l.ChiTestLimit * 10000000000000) + ".json", l.SerializeDecisionTree()));
+			// Parallel.ForEach(listOfTreesToRunTestOn, l => File.WriteAllText("Chi" + Convert.ToInt64(l.ChiTestLimit * 10000000000000) + ".json", l.SerializeDecisionTree()));
 
 			Console.WriteLine("Evaluating trees against test data...");
-			// Evaluate the trees with the test dataset
 			List<DecisionTreeScore> scores = listOfTreesToRunTestOn.AsParallel().Select(t => DecisionTreeScorer.ScoreWithTreeWithTestSet(t, testData.Values)).ToList();
 
 			// Print the results to console
