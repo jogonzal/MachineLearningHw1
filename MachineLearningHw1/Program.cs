@@ -18,7 +18,7 @@ namespace MachineLearningHw1
 			List<DataSetAttribute> attributes = AttributeParser.ParseAttributes(dataSetAsString);
 			List<DataSetValue> dataSetValues = DataParser.ParseData(dataSetAsString);
 
-			// Validate the dataset
+			// Validate and clean the dataset
 			DataSetCleaner.ValidateDataSet(attributes, dataSetValues);
 
 			// Initialize the tree
