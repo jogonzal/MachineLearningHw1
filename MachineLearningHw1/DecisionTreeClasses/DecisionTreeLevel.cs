@@ -23,21 +23,16 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		private bool? _localValue;
 
-		public List<DataSetAttribute> Attributes { get; set; }
-		public List<DataSetValue> Values { get; set; }
-
-		public DecisionTreeLevel(List<DataSetAttribute> attributes, List<DataSetValue> values, double chiTestLimit)
+		public DecisionTreeLevel(double chiTestLimit)
 		{
 			ChiTestLimit = chiTestLimit;
-			Attributes = attributes;
-			Values = values;
 		}
 
-		public void D3()
+		public void D3(List<DataSetAttribute> attributes, List<DataSetValue> values)
 		{
 			// Check whether we even need to split or not
-			int totalTrueValues = Values.Count(v => v.Output);
-			int totalFalseValues = Values.Count(v => !v.Output);
+			int totalTrueValues = values.Count(v => v.Output);
+			int totalFalseValues = values.Count(v => !v.Output);
 
 			if (totalFalseValues == 0 && totalTrueValues > 0)
 			{
@@ -52,7 +47,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			}
 
 			// Can we split on attributes?
-			if (Attributes.Count == 0)
+			if (attributes.Count == 0)
 			{
 				// Can't split anymore. We'll decide on the most prevalent value
 				_localValue = totalTrueValues > totalFalseValues;
@@ -60,7 +55,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			}
 
 			// First, find the attribute with the highest "E"
-			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes();
+			List<DataSetAttributeWithCounts> e = CalculateEForAllAttributes(attributes, values);
 			DataSetAttributeWithCounts attributeWithMinEntropy = FindAttributeWithMinEntropy(e);
 			_attributeToSplitOn = attributeWithMinEntropy;
 
@@ -73,27 +68,36 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			}
 
 			// Remove this attribute from the list of new attributes to create new subtrees
-			List<DataSetAttribute> newAttributes = Attributes.Where(a => a.Name != attributeWithMinEntropy.Name).ToList();
+			List<DataSetAttribute> newAttributes = attributes.Where(a => a.Name != attributeWithMinEntropy.Name).ToList();
 
 			// Split the values in many sets
 			_dictionaryOfSubTrees = new Dictionary<string, DecisionTreeLevel>(attributeWithMinEntropy.PossibleValues.Count);
-			foreach (var dataSetValue in Values)
+			var dictionaryOfValues = new Dictionary<string, List<DataSetValue>>();
+			foreach (var dataSetValue in values)
 			{
 				string value = dataSetValue.Values[attributeWithMinEntropy.ValueIndex];
 				DecisionTreeLevel localTreeLevel;
+				List<DataSetValue> localValues;
 				if (!_dictionaryOfSubTrees.TryGetValue(value, out localTreeLevel))
 				{
-					localTreeLevel = new DecisionTreeLevel(newAttributes, new List<DataSetValue>(), ChiTestLimit);
+					localTreeLevel = new DecisionTreeLevel(ChiTestLimit);
 					_dictionaryOfSubTrees[value] = localTreeLevel;
+					localValues = new List<DataSetValue>();
+					dictionaryOfValues[value] = localValues;
+				}
+				else
+				{
+					localValues = dictionaryOfValues[value];
 				}
 
-				localTreeLevel.Values.Add(dataSetValue);
+				localValues.Add(dataSetValue);
 			}
 
 			// Recursively run D3 on them
-			foreach (var decisionTree in _dictionaryOfSubTrees.Values)
+			foreach (var decisionTree in _dictionaryOfSubTrees)
 			{
-				decisionTree.D3();
+				var localValues = dictionaryOfValues[decisionTree.Key];
+				decisionTree.Value.D3(newAttributes, localValues);
 			}
 		}
 
@@ -136,12 +140,12 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			return attributeWithMinEntropy;
 		}
 
-		private List<DataSetAttributeWithCounts> CalculateEForAllAttributes()
+		private List<DataSetAttributeWithCounts> CalculateEForAllAttributes(List<DataSetAttribute> attributes, List<DataSetValue> values)
 		{
 			// First, compute the count of appearences of possible vlaues and their counts
 			List<DataSetAttributeWithCounts> attributeWithCounts =
-				Attributes.Select(s => new DataSetAttributeWithCounts(s.Name, s.PossibleValues, s.ValueIndex)).ToList();
-			foreach (var value in Values)
+				attributes.Select(s => new DataSetAttributeWithCounts(s.Name, s.PossibleValues, s.ValueIndex)).ToList();
+			foreach (var value in values)
 			{
 				foreach (var dataSetAttributeWithCounts in attributeWithCounts)
 				{
@@ -183,6 +187,21 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		{
 			var decisionTree = GetDecisionTree();
 			return JsonConvert.SerializeObject(decisionTree, Formatting.Indented);
+		}
+
+		public int GetNodeCount()
+		{
+			if (_localValue.HasValue)
+			{
+				return 1;
+			}
+
+			int nodeCount = 1;
+			foreach (var keyValuePair in _dictionaryOfSubTrees)
+			{
+				nodeCount += keyValuePair.Value.GetNodeCount();
+			}
+			return nodeCount;
 		}
 
 		private object GetDecisionTree()

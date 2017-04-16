@@ -25,21 +25,23 @@ namespace MachineLearningHw1.DataSet
 			string value;
 			using (StringReader sr = new StringReader(stringToRead))
 			{
-				var csv = new CsvReader(sr);
-				csv.Configuration.HasHeaderRecord = false;
-				while (csv.Read())
+				using (var csv = new CsvReader(sr))
 				{
-					List<string> line = new List<string>();
-					for (int i = 0; csv.TryGetField<string>(i, out value); i++)
+					csv.Configuration.HasHeaderRecord = false;
+					while (csv.Read())
 					{
-						line.Add(value);
+						List<string> line = new List<string>();
+						for (int i = 0; csv.TryGetField<string>(i, out value); i++)
+						{
+							line.Add(value);
+						}
+
+						// Get the last attribute, which should be boolean
+						bool lastValue = bool.Parse(line[line.Count - 1]);
+						line.RemoveAt(line.Count - 1);
+
+						result.Add(new DataSetValue(line, lastValue));
 					}
-
-					// Get the last attribute, which should be boolean
-					bool lastValue = bool.Parse(line[line.Count - 1]);
-					line.RemoveAt(line.Count - 1);
-
-					result.Add(new DataSetValue(line, lastValue));
 				}
 			}
 			return result;

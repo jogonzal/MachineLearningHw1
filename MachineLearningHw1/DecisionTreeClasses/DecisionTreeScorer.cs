@@ -12,6 +12,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 		public double FalsePositive { get; set; }
 		public double NegativeHits { get; set; }
 		public double FalseNegative { get; set; }
+		public int NodeCount { get; set; }
 
 		public DecisionTreeScore(double positiveHit, double falsePositive, double negativeHits, double falseNegative, DecisionTreeLevel decisionTree)
 		{
@@ -29,7 +30,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		public void PrintTotalScore()
 		{
-			Console.WriteLine($"Score for tree with CHI({_decisionTree.ChiTestLimit}) = {GetTotalScore()}");
+			Console.WriteLine($"Score for tree with CHI({_decisionTree.ChiTestLimit}) = {GetTotalScore()}. Total nodes: {NodeCount}");
 		}
 	}
 
@@ -58,6 +59,8 @@ namespace MachineLearningHw1.DecisionTreeClasses
 					score.FalseNegative++;
 				}
 			}
+
+			score.NodeCount = decisionTree.GetNodeCount();
 
 			return score;
 		}
