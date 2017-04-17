@@ -24,6 +24,9 @@ namespace MachineLearningHw1.DecisionTreeClasses
 
 		private bool? _localValue;
 
+		private int _evaluatedTrueCount = 0;
+		private int _evaluatedFalseCount = 0;
+
 		public DecisionTreeLevel(double chiTestLimit)
 		{
 			ChiTestLimit = chiTestLimit;
@@ -163,7 +166,7 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			return attributeWithCounts;
 		}
 
-		public bool Evaluate(List<string> list)
+		private bool EvaluatePrivate(List<string> list)
 		{
 			if (_localValue.HasValue)
 			{
@@ -182,6 +185,20 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			}
 
 			return nextTreeLevel.Evaluate(list);
+		}
+
+		public bool Evaluate(List<string> list)
+		{
+			bool evaluated = EvaluatePrivate(list);
+			if (evaluated)
+			{
+				_evaluatedTrueCount++;
+			}
+			else
+			{
+				_evaluatedFalseCount++;
+			}
+			return evaluated;
 		}
 
 		public string SerializeDecisionTree()
@@ -205,16 +222,36 @@ namespace MachineLearningHw1.DecisionTreeClasses
 			return nodeCount;
 		}
 
+		private string EvaluatedString()
+		{
+			string s = "";
+			if (_evaluatedTrueCount > 0)
+			{
+				s += "(true=" + _evaluatedTrueCount + ") ";
+			}
+			if (_evaluatedFalseCount > 0)
+			{
+				s += "(false=" + _evaluatedFalseCount + ") ";
+			}
+
+			if (_evaluatedTrueCount == 0 && _evaluatedFalseCount == 0)
+			{
+				s += "(0 evaluated)";
+			}
+
+			return s;
+		}
+
 		private object GetDecisionTree()
 		{
 			if (_localValue.HasValue)
 			{
-				return _localValue;
+				return _localValue + EvaluatedString();
 			}
 
 			var dict = new Dictionary<string, Dictionary<string, object>>();
 			var internalDict = new Dictionary<string, object>();
-			dict[_attributeToSplitOn.Name] = internalDict;
+			dict[_attributeToSplitOn.Name + EvaluatedString()] = internalDict;
 			foreach (var keyValuePair in _dictionaryOfSubTrees)
 			{
 				internalDict[keyValuePair.Key] = keyValuePair.Value.GetDecisionTree();

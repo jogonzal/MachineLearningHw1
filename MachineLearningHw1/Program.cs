@@ -39,16 +39,24 @@ namespace MachineLearningHw1
 			Console.WriteLine("Getting test data set...");
 			ParserResults testData = ParserUtils.ParseData(TestSetPath);
 
+			Console.WriteLine("Evaluating trees against test data...");
+			List<DecisionTreeScore> scores = listOfTreesToRunTestOn.AsParallel().Select(t => DecisionTreeScorer.ScoreWithTreeWithTestSet(t, testData.Values)).ToList();
+
 			//Console.WriteLine("Writing trees to text files (for debugging/visualization)...");
 			// Dump the trees to a txt file for debugging/visualization
 			// NOTE: This won't work the the Chi=0 case - the JSON file generated is too big
 			// Parallel.ForEach(listOfTreesToRunTestOn, l => File.WriteAllText("Chi" + Convert.ToInt64(l.ChiTestLimit * 10000000000000) + ".json", l.SerializeDecisionTree()));
 
-			Console.WriteLine("Evaluating trees against test data...");
-			List<DecisionTreeScore> scores = listOfTreesToRunTestOn.AsParallel().Select(t => DecisionTreeScorer.ScoreWithTreeWithTestSet(t, testData.Values)).ToList();
+			List<DecisionTreeScore> trainingDataScores = listOfTreesToRunTestOn.AsParallel().Select(t => DecisionTreeScorer.ScoreWithTreeWithTestSet(t, trainingData.Values)).ToList();
 
 			// Print the results to console
 			foreach (var score in scores)
+			{
+				score.PrintTotalScore();
+			}
+
+			Console.WriteLine("Training data scores:");
+			foreach (var score in trainingDataScores)
 			{
 				score.PrintTotalScore();
 			}
