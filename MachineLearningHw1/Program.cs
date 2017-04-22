@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using MachineLearningHw1.DataSet;
 using MachineLearningHw1.DecisionTreeClasses;
+using MachineLearningHw1.Optimizations;
 
 namespace MachineLearningHw1
 {
@@ -18,6 +19,7 @@ namespace MachineLearningHw1
 		{
 			Console.WriteLine("Reading training data...");
 			ParserResults trainingData = ParserUtils.ParseData(DataSetPath);
+			// DataSetOptimizerForExtraCredit.OptimizeDataSetForExtraCredit(trainingData.Attributes, trainingData.Values);
 
 			Console.WriteLine("Validating data set");
 			DataSetCleaner.ValidateDataSet(trainingData.Attributes, trainingData.Values);
@@ -38,6 +40,7 @@ namespace MachineLearningHw1
 
 			Console.WriteLine("Getting test data set...");
 			ParserResults testData = ParserUtils.ParseData(TestSetPath);
+			// DataSetOptimizerForExtraCredit.OptimizeDataSetForExtraCredit(testData.Attributes, testData.Values);
 
 			Console.WriteLine("Evaluating trees against test data...");
 			List<DecisionTreeScore> scores = listOfTreesToRunTestOn.AsParallel().Select(t => DecisionTreeScorer.ScoreWithTreeWithTestSet(t, testData.Values)).ToList();

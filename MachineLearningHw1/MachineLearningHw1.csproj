@@ -64,6 +64,7 @@
     <Compile Include="DecisionTreeClasses\DataSetAttributeWithCounts.cs" />
     <Compile Include="DecisionTreeClasses\DecisionTreeLevel.cs" />
     <Compile Include="DecisionTreeClasses\DecisionTreeScorer.cs" />
+    <Compile Include="Optimizations\DataSetOptimizerForExtraCredit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Statistics\ChiSquaredUtils.cs" />
