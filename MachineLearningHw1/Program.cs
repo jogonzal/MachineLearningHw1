@@ -60,7 +60,7 @@ namespace MachineLearningHw1
 				score.PrintTotalScore();
 			}
 
-			Console.WriteLine("Training data scores:");
+			Console.WriteLine("Evaluating trees against training data:");
 			foreach (var score in trainingDataScores)
 			{
 				score.PrintTotalScore();
