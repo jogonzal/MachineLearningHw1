@@ -17,6 +17,25 @@ namespace MachineLearningHw1
 
 		static void Main(string[] args)
 		{
+			string errorMessage = "";
+			if (!File.Exists(DataSetPath))
+			{
+				errorMessage += $"Failed to find file ${DataSetPath} - please update variable ${nameof(DataSetPath)} or create that file.\n";
+			}
+			if (!File.Exists(TestSetPath))
+			{
+				errorMessage += $"Failed to find file ${TestSetPath} - please update variable ${nameof(TestSetPath)} or create that file.\n";
+			}
+
+			if (errorMessage != "")
+			{
+				Console.BackgroundColor = ConsoleColor.Red;
+				Console.WriteLine("Not all files available - not running!");
+				Console.WriteLine(errorMessage);
+				Console.ResetColor();
+				return;
+			}
+
 			Console.WriteLine("Reading training data...");
 			ParserResults trainingData = ParserUtils.ParseData(DataSetPath);
 			// Optimizations are optional
