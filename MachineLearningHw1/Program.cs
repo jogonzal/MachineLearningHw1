@@ -19,6 +19,7 @@ namespace MachineLearningHw1
 		{
 			Console.WriteLine("Reading training data...");
 			ParserResults trainingData = ParserUtils.ParseData(DataSetPath);
+			// Optimizations are optional
 			// DataSetOptimizerForExtraCredit.OptimizeDataSetForExtraCredit(trainingData.Attributes, trainingData.Values);
 
 			Console.WriteLine("Validating data set");
@@ -40,6 +41,7 @@ namespace MachineLearningHw1
 
 			Console.WriteLine("Getting test data set...");
 			ParserResults testData = ParserUtils.ParseData(TestSetPath);
+			// Optimizations are optional
 			// DataSetOptimizerForExtraCredit.OptimizeDataSetForExtraCredit(testData.Attributes, testData.Values);
 
 			Console.WriteLine("Evaluating trees against test data...");
