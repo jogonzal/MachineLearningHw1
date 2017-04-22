@@ -29,10 +29,12 @@ namespace MachineLearningHw1
 
 			if (errorMessage != "")
 			{
-				Console.BackgroundColor = ConsoleColor.Red;
+				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("Not all files available - not running!");
 				Console.WriteLine(errorMessage);
 				Console.ResetColor();
+				Console.WriteLine("Press any key to continue...");
+				Console.ReadKey();
 				return;
 			}
 
